@@ -57,6 +57,7 @@
   "back": "Back",
   "routes": {
     "home": "Home",
+    "facilities": "Facilities",
     "account": "Account",
     "members": "Members",
     "billing": "Billing",

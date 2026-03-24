@@ -1,4 +1,4 @@
-import { Home, User } from 'lucide-react';
+import { Building, Home, User } from 'lucide-react';
 import { z } from 'zod';
 
 import { NavigationConfigSchema } from '@kit/ui/navigation-schema';
@@ -17,6 +17,11 @@ const routes = [
         Icon: <Home className={iconClasses} />,
         end: true,
       },
+      {
+        label: 'common:routes.facilities',
+        path: pathsConfig.app.facilities,
+        Icon: <Building className={iconClasses} />,
+      }
     ],
   },
   {
