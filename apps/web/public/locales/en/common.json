@@ -58,6 +58,13 @@
   "routes": {
     "home": "Home",
     "facilities": "Facilities",
+      "hotels": "Hotels",
+      "locations": "Locations",
+      "rooms": "Rooms",
+      "hotelFacilities": "Hotel Facilities",
+      "promotions": "Promotions",
+      "bookings": "Bookings",
+      "reviews": "Reviews",
     "account": "Account",
     "members": "Members",
     "billing": "Billing",
