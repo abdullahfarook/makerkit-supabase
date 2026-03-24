@@ -21,10 +21,31 @@ async function uploadIcon(file: File, facilityId: string): Promise<string> {
   const ext = file.name.split('.').pop() || 'png';
   const path = `${facilityId}.${ext}`;
   const bytes = await file.arrayBuffer();
-  const { error } = await supabase.storage
-    .from(FACILITY_ICONS_BUCKET)
-    .upload(path, bytes, { upsert: true });
-  if (error) throw error;
+  // Ensure facility_icons bucket exists (create if missing). Ignore errors
+  // if creation isn't permitted or bucket already exists.
+  try {
+    // @ts-ignore: createBucket may not be present on the client typings
+    await supabase.storage.createBucket?.(FACILITY_ICONS_BUCKET, { public: true });
+  } catch (err) {
+    // ignore
+  }
+
+  try {
+    // Convert ArrayBuffer to Uint8Array for upload compatibility
+    const buffer = new Uint8Array(bytes as ArrayBuffer);
+    const { error } = await supabase.storage.from(FACILITY_ICONS_BUCKET).upload(path, buffer, { upsert: true });
+    if (error) {
+      // Provide more context in the thrown error for easier debugging
+      const msg = `Supabase upload error: ${error.message ?? JSON.stringify(error)}`;
+      // eslint-disable-next-line no-console
+      console.error('uploadIcon:', { path, bucket: FACILITY_ICONS_BUCKET, error });
+      throw new Error(msg);
+    }
+  } catch (err: any) {
+    // eslint-disable-next-line no-console
+    console.error('uploadIcon unexpected error', err);
+    throw new Error(`Failed to upload icon: ${err?.message ?? String(err)}`);
+  }
   const {
     data: { publicUrl },
   } = supabase.storage.from(FACILITY_ICONS_BUCKET).getPublicUrl(path);
@@ -77,7 +98,7 @@ export const createFacilityAction = enhanceAction(
         .update({ icon: iconUrl, updated_at: new Date().toISOString() })
         .eq('id', facilityId);
     }
-    revalidatePath('/home/facilities');
+    revalidatePath('/home/hotels');
     return { success: true };
   },
   { auth: true },
@@ -109,7 +130,7 @@ export const updateFacilityAction = enhanceAction(
       .update(updatePayload)
       .eq('id', parsed.data.id);
     if (error) throw error;
-    revalidatePath('/home/facilities');
+    revalidatePath('/home/hotels');
     return { success: true };
   },
   { auth: true },
@@ -136,7 +157,7 @@ export const deleteFacilityAction = enhanceAction(
     }
     const { error } = await supabase.from('facility').delete().eq('id', parsed.data.id);
     if (error) throw error;
-    revalidatePath('/home/facilities');
+    revalidatePath('/home/hotels');
     return { success: true };
   },
   { auth: true },

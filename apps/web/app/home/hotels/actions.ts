@@ -56,15 +56,33 @@ export const createHotelAction = enhanceAction(async (formData: FormData, user) 
   const slug = slugFromName(parsed.data.name);
   const supabase = getSupabaseServerAdminClient();
 
-  const { error } = await supabase.from('hotel').insert({
+  const { data: inserted, error: insertErr } = await supabase.from('hotel').insert({
     name: parsed.data.name,
     slug,
     address: parsed.data.address ?? null,
     class: parsed.data.class ?? null,
     location_slug: parsed.data.location_slug ?? null,
     is_active: parsed.data.is_active ?? true,
-  });
-  if (error) throw error;
+  }).select('id').single();
+  if (insertErr) throw insertErr;
+  const hotelId = inserted.id;
+
+  // handle facility attachments (existing ids and new facilities)
+  const facilityIds = (formData.getAll('facility_ids') as string[]).map((v) => Number(v)).filter(Boolean);
+  const newFacilities = (formData.getAll('new_facilities') as string[]).map((s) => s?.trim()).filter(Boolean as any) as string[];
+  const createdFacilityIds: number[] = [];
+  for (const name of newFacilities) {
+    const fslug = slugFromName(name);
+    const { data: frow, error: ferr } = await supabase.from('facility').insert({ name, slug: fslug, icon: null }).select('id').single();
+    if (ferr) throw ferr;
+    createdFacilityIds.push(frow.id);
+  }
+  const allFacilityIds = [...facilityIds, ...createdFacilityIds];
+  if (allFacilityIds.length > 0) {
+    const rows = allFacilityIds.map((fid) => ({ hotel_id: hotelId, facility_id: fid }));
+    const { error: hfErr } = await supabase.from('hotel_facility').insert(rows);
+    if (hfErr) throw hfErr;
+  }
 
   revalidatePath('/home/hotels');
   return { success: true };
@@ -105,6 +123,28 @@ export const updateHotelAction = enhanceAction(async (formData: FormData, user) 
 
   const { error } = await supabase.from('hotel').update(updatePayload).eq('id', parsed.data.id);
   if (error) throw error;
+
+  // handle facility attachments when provided: replace existing attachments
+  const facilityIds = (formData.getAll('facility_ids') as string[]).map((v) => Number(v)).filter(Boolean);
+  const newFacilities = (formData.getAll('new_facilities') as string[]).map((s) => s?.trim()).filter(Boolean as any) as string[];
+  if (facilityIds.length > 0 || newFacilities.length > 0) {
+    // delete existing
+    const { error: delErr } = await supabase.from('hotel_facility').delete().eq('hotel_id', parsed.data.id);
+    if (delErr) throw delErr;
+    const createdFacilityIds: number[] = [];
+    for (const name of newFacilities) {
+      const fslug = slugFromName(name);
+      const { data: frow, error: ferr } = await supabase.from('facility').insert({ name, slug: fslug, icon: null }).select('id').single();
+      if (ferr) throw ferr;
+      createdFacilityIds.push(frow.id);
+    }
+    const allFacilityIds = [...facilityIds, ...createdFacilityIds];
+    if (allFacilityIds.length > 0) {
+      const rows = allFacilityIds.map((fid) => ({ hotel_id: parsed.data.id, facility_id: fid }));
+      const { error: hfErr } = await supabase.from('hotel_facility').insert(rows);
+      if (hfErr) throw hfErr;
+    }
+  }
 
   revalidatePath('/home/hotels');
   return { success: true };

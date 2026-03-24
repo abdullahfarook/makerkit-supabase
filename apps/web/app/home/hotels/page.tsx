@@ -6,7 +6,10 @@ import { HotelsClient } from './_components/hotels-client';
 
 export default async function HotelsPage() {
   const supabase = getSupabaseServerAdminClient();
-  const { data: hotels, error } = await supabase.from('hotel').select('*').order('name');
+  const [{ data: hotels, error }, { data: facilities }] = await Promise.all([
+    supabase.from('hotel').select('*, hotel_facility(facility_id)').order('name'),
+    supabase.from('facility').select('id,name,icon').order('name'),
+  ]);
 
   if (error) {
     if (error.code === '42P01' || error.message?.includes('does not exist')) {
@@ -53,7 +56,7 @@ export default async function HotelsPage() {
     <>
       <PageHeader description={'Hotels'} />
       <PageBody>
-        <HotelsClient hotels={hotels ?? []} />
+        <HotelsClient hotels={hotels ?? []} facilities={facilities ?? []} />
       </PageBody>
     </>
   );

@@ -18,11 +18,6 @@ const routes = [
         end: true,
       },
       {
-        label: 'common:routes.facilities',
-        path: pathsConfig.app.facilities,
-        Icon: <Building className={iconClasses} />,
-      },
-      {
         label: 'common:routes.hotels',
         path: pathsConfig.app.hotels,
         Icon: <MapPin className={iconClasses} />,
@@ -37,11 +32,7 @@ const routes = [
         path: pathsConfig.app.rooms,
         Icon: <List className={iconClasses} />,
       },
-      {
-        label: 'common:routes.hotelFacilities',
-        path: pathsConfig.app.hotelFacilities,
-        Icon: <Layers className={iconClasses} />,
-      },
+      /* Facilities and Hotel Facilities merged into Hotels view */
       {
         label: 'common:routes.promotions',
         path: pathsConfig.app.promotions,

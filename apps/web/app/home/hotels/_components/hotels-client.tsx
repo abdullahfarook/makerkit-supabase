@@ -33,7 +33,9 @@ import { Card } from '@kit/ui/card';
 
 type Hotel = Tables<'hotel'>;
 
-export function HotelsClient({ hotels }: { hotels: Hotel[] }) {
+type Facility = Tables<'facility'>;
+
+export function HotelsClient({ hotels, facilities }: { hotels: Hotel[]; facilities: Facility[] }) {
   const [createOpen, setCreateOpen] = useState(false);
   const [editHotel, setEditHotel] = useState<Hotel | null>(null);
   const [editOpen, setEditOpen] = useState(false);
@@ -64,11 +66,14 @@ export function HotelsClient({ hotels }: { hotels: Hotel[] }) {
   return (
     <Card className="p-4">
       <div className="space-y-4">
-        <div className="flex justify-end">
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create hotel
-          </Button>
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">Facilities: {facilities.length}</div>
+          <div>
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create hotel
+            </Button>
+          </div>
         </div>
         <div className="rounded-md border">
           <Table>
@@ -111,10 +116,11 @@ export function HotelsClient({ hotels }: { hotels: Hotel[] }) {
             </TableBody>
           </Table>
         </div>
-        <CreateHotelDialog open={createOpen} onOpenChange={setCreateOpen} />
+        <CreateHotelDialog open={createOpen} onOpenChange={setCreateOpen} facilities={facilities} />
         <EditHotelDialog
           hotel={editHotel}
           open={editOpen}
+          facilities={facilities}
           onOpenChange={(open) => {
             setEditOpen(open);
             if (!open) setEditHotel(null);
