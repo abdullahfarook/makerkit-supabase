@@ -23,19 +23,19 @@ import {
   TableHeader,
   TableRow,
 } from '@kit/ui/table';
-import { deleteFacilityAction } from '../actions';
+import { deleteHotelAction } from '../actions';
 
 import type { Tables } from '~/lib/database.types';
 
-import { CreateFacilityDialog } from './create-facility-dialog';
-import { EditFacilityDialog } from './edit-facility-dialog';
-import { Card, CardHeader } from '@kit/ui/card';
+import { CreateHotelDialog } from './create-hotel-dialog';
+import { EditHotelDialog } from './edit-hotel-dialog';
+import { Card } from '@kit/ui/card';
 
-type Facility = Tables<'facility'>;
+type Hotel = Tables<'hotel'>;
 
-export function FacilitiesClient({ facilities }: { facilities: Facility[] }) {
+export function HotelsClient({ hotels }: { hotels: Hotel[] }) {
   const [createOpen, setCreateOpen] = useState(false);
-  const [editFacility, setEditFacility] = useState<Facility | null>(null);
+  const [editHotel, setEditHotel] = useState<Hotel | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deletePending, setDeletePending] = useState(false);
@@ -46,8 +46,8 @@ export function FacilitiesClient({ facilities }: { facilities: Facility[] }) {
     try {
       const formData = new FormData();
       formData.set('id', String(deleteId));
-      await deleteFacilityAction(formData);
-      toast.success('Facility deleted');
+      await deleteHotelAction(formData);
+      toast.success('Hotel deleted');
       setDeleteId(null);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to delete');
@@ -56,8 +56,8 @@ export function FacilitiesClient({ facilities }: { facilities: Facility[] }) {
     }
   };
 
-  const openEdit = (facility: Facility) => {
-    setEditFacility(facility);
+  const openEdit = (hotel: Hotel) => {
+    setEditHotel(hotel);
     setEditOpen(true);
   };
 
@@ -67,59 +67,40 @@ export function FacilitiesClient({ facilities }: { facilities: Facility[] }) {
         <div className="flex justify-end">
           <Button onClick={() => setCreateOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Create facility
+            Create hotel
           </Button>
         </div>
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16">Icon</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Slug</TableHead>
+                <TableHead>Class</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>Active</TableHead>
                 <TableHead className="w-[120px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {facilities.length === 0 ? (
+              {hotels.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                     No data available
                   </TableCell>
                 </TableRow>
               ) : (
-                facilities.map((facility) => (
-                  <TableRow key={facility.id}>
-                    <TableCell>
-                      {facility.icon ? (
-                        <img
-                          src={facility.icon}
-                          alt={facility.name}
-                          className="h-8 w-8 rounded object-cover"
-                        />
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="font-medium">{facility.name}</TableCell>
-                    <TableCell className="text-muted-foreground">{facility.slug}</TableCell>
+                hotels.map((hotel) => (
+                  <TableRow key={hotel.id}>
+                    <TableCell className="font-medium">{hotel.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{hotel.class ?? '—'}</TableCell>
+                    <TableCell className="text-muted-foreground">{hotel.address ?? '—'}</TableCell>
+                    <TableCell className="text-muted-foreground">{hotel.is_active ? 'Yes' : 'No'}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEdit(facility)}
-                          aria-label="Edit"
-                        >
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(hotel)} aria-label="Edit">
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setDeleteId(facility.id)}
-                          aria-label="Delete"
-                          className="text-destructive hover:text-destructive"
-                        >
+                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(hotel.id)} aria-label="Delete" className="text-destructive hover:text-destructive">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -130,23 +111,21 @@ export function FacilitiesClient({ facilities }: { facilities: Facility[] }) {
             </TableBody>
           </Table>
         </div>
-        <CreateFacilityDialog open={createOpen} onOpenChange={setCreateOpen} />
-        <EditFacilityDialog
-          facility={editFacility}
+        <CreateHotelDialog open={createOpen} onOpenChange={setCreateOpen} />
+        <EditHotelDialog
+          hotel={editHotel}
           open={editOpen}
           onOpenChange={(open) => {
             setEditOpen(open);
-            if (!open) setEditFacility(null);
+            if (!open) setEditHotel(null);
           }}
         />
         <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>
-                Are you sure you want to continue?
-              </AlertDialogTitle>
+              <AlertDialogTitle>Are you sure you want to continue?</AlertDialogTitle>
               <AlertDialogDescription>
-                This will permanently delete this facility. This action cannot be undone.
+                This will permanently delete this hotel. This action cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -166,6 +145,5 @@ export function FacilitiesClient({ facilities }: { facilities: Facility[] }) {
         </AlertDialog>
       </div>
     </Card>
-
   );
 }

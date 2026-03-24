@@ -245,33 +245,7 @@ export type Database = {
           },
         ]
       }
-      facilities: {
-        Row: {
-          created_at: string | null
-          icon: string | null
-          id: string
-          name: string
-          slug: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          icon?: string | null
-          id?: string
-          name: string
-          slug: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          icon?: string | null
-          id?: string
-          name?: string
-          slug?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+      
       facility: {
         Row: {
           icon: string | null

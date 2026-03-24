@@ -1,0 +1,175 @@
+erDiagram
+  ACCOUNTS {
+    string id PK
+    string name
+    string email
+  }
+
+  BOOKING {
+    string id PK
+    string account_id FK
+    string hotel_slug FK
+    number room_id FK
+  }
+
+  BOOKING_DETAIL {
+    number id PK
+    string booking_id FK
+    number room_id FK
+    number gross_amount
+  }
+
+  HOTEL {
+    string id PK
+    string slug
+    string name
+    string location_slug FK
+  }
+
+  HOTEL_ROOMS {
+    number id PK
+    string hotel_slug FK
+    number room_category_id FK
+    number price_per_night
+  }
+
+  ROOM_CATEGORY {
+    number id PK
+    string name
+  }
+
+  FACILITY {
+    number id PK
+    string name
+  }
+
+  FACILITIES {
+    string id PK
+    string name
+    string slug
+  }
+
+  HOTEL_FACILITY {
+    number facility_id FK
+    string hotel_id FK
+  }
+
+  HOTEL_IMAGES {
+    number id PK
+    string hotel_slug FK
+    string url
+  }
+
+  ROOM_IMAGES {
+    number id PK
+    number room_id FK
+    string url
+  }
+
+  PAYMENT {
+    number id PK
+    string booking_id FK
+    number amount
+  }
+
+  PROMOTION {
+    string code PK
+    string hotel_id FK
+  }
+
+  REVIEW {
+    number id PK
+    string booking_id FK
+    string hotel_id FK
+  }
+
+  REVIEW_DETAIL_RATING {
+    number id PK
+    number review_id FK
+    number rating
+  }
+
+  SEARCH_LOG {
+    number id PK
+    string location_id FK
+    string user_id FK
+  }
+
+  BUCKETS {
+    string id PK
+    string name
+    string type
+  }
+
+  OBJECTS {
+    string id PK
+    string bucket_id FK
+    string name
+  }
+
+  S3_MULTIPART_UPLOADS {
+    string id PK
+    string bucket_id FK
+    string key
+  }
+
+  S3_MULTIPART_UPLOADS_PARTS {
+    string id PK
+    string upload_id FK
+    string bucket_id FK
+    number part_number
+  }
+
+  BUCKETS_ANALYTICS {
+    string id PK
+    string name
+  }
+
+  ICEBERG_NAMESPACES {
+    string id PK
+    string catalog_id FK
+  }
+
+  ICEBERG_TABLES {
+    string id PK
+    string catalog_id FK
+    string namespace_id FK
+  }
+
+  BUCKETS_VECTORS {
+    string id PK
+    string name
+  }
+
+  VECTOR_INDEXES {
+    string id PK
+    string bucket_id FK
+  }
+
+  %% Relationships (one-to-many shown)
+  ACCOUNTS ||--o{ BOOKING : "bookings"
+  BOOKING ||--o{ BOOKING_DETAIL : "details"
+  HOTEL ||--o{ BOOKING : "bookings"
+  HOTEL ||--o{ HOTEL_ROOMS : "rooms"
+  ROOM_CATEGORY ||--o{ HOTEL_ROOMS : "room_category"
+  HOTEL ||--o{ HOTEL_IMAGES : "images"
+  HOTEL_ROOMS ||--o{ ROOM_IMAGES : "images"
+  FACILITY ||--o{ HOTEL_FACILITY : "facility_links"
+  HOTEL ||--o{ HOTEL_FACILITY : "facility_links"
+  BOOKING ||--o{ PAYMENT : "payments"
+  HOTEL ||--o{ PROMOTION : "promotions"
+  BOOKING ||--o{ REVIEW : "reviews"
+  HOTEL ||--o{ REVIEW : "reviews"
+  REVIEW ||--o{ REVIEW_DETAIL_RATING : "ratings"
+  SEARCH_LOG ||--o{ ACCOUNTS : "user"  %% (search_log.user_id -> accounts.id)
+  HOTEL ||--o{ LOCATION : "location"     %% (hotel.location_slug -> location.slug) — conceptual link
+
+  %% Storage relationships
+  BUCKETS ||--o{ OBJECTS : "objects"
+  BUCKETS ||--o{ S3_MULTIPART_UPLOADS : "uploads"
+  S3_MULTIPART_UPLOADS ||--o{ S3_MULTIPART_UPLOADS_PARTS : "parts"
+  BUCKETS ||--o{ S3_MULTIPART_UPLOADS_PARTS : "parts_by_bucket"
+  BUCKETS_ANALYTICS ||--o{ ICEBERG_NAMESPACES : "namespaces"
+  BUCKETS_ANALYTICS ||--o{ ICEBERG_TABLES : "tables"
+  ICEBERG_NAMESPACES ||--o{ ICEBERG_TABLES : "namespace_tables"
+  BUCKETS_VECTORS ||--o{ VECTOR_INDEXES : "vector_indexes"

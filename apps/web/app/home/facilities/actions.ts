@@ -45,11 +45,11 @@ const CreateFacilitySchema = z.object({
   name: z.string().min(1, 'Name is required'),
 });
 const UpdateFacilitySchema = z.object({
-  id: z.string().uuid(),
+  id: z.preprocess((v) => Number(v), z.number()),
   name: z.string().min(1, 'Name is required'),
 });
 const DeleteFacilitySchema = z.object({
-  id: z.string().uuid(),
+  id: z.preprocess((v) => Number(v), z.number()),
 });
 
 export const createFacilityAction = enhanceAction(
@@ -64,16 +64,16 @@ export const createFacilityAction = enhanceAction(
     const iconFile = formData.get('icon') as File | null;
     let iconUrl: string | null = null;
     const { data: row, error: insertError } = await supabase
-      .from('facilities')
+      .from('facility')
       .insert({ name: parsed.data.name, slug, icon: null })
       .select('id')
       .single();
     if (insertError) throw insertError;
     const facilityId = row.id;
     if (iconFile && iconFile.size > 0) {
-      iconUrl = await uploadIcon(iconFile, facilityId);
+      iconUrl = await uploadIcon(iconFile, String(facilityId));
       await supabase
-        .from('facilities')
+        .from('facility')
         .update({ icon: iconUrl, updated_at: new Date().toISOString() })
         .eq('id', facilityId);
     }
@@ -96,7 +96,7 @@ export const updateFacilityAction = enhanceAction(
     const iconFile = formData.get('icon') as File | null;
     let iconUrl: string | null | undefined;
     if (iconFile && iconFile.size > 0) {
-      iconUrl = await uploadIcon(iconFile, parsed.data.id);
+      iconUrl = await uploadIcon(iconFile, String(parsed.data.id));
     }
     const updatePayload: { name: string; slug: string; updated_at: string; icon?: string | null } = {
       name: parsed.data.name,
@@ -105,7 +105,7 @@ export const updateFacilityAction = enhanceAction(
     };
     if (iconUrl !== undefined) updatePayload.icon = iconUrl;
     const { error } = await supabase
-      .from('facilities')
+      .from('facility')
       .update(updatePayload)
       .eq('id', parsed.data.id);
     if (error) throw error;
@@ -124,7 +124,7 @@ export const deleteFacilityAction = enhanceAction(
     }
     const supabase = getSupabaseServerAdminClient();
     const { data: facility } = await supabase
-      .from('facilities')
+      .from('facility')
       .select('icon')
       .eq('id', parsed.data.id)
       .single();
@@ -134,7 +134,7 @@ export const deleteFacilityAction = enhanceAction(
         await supabase.storage.from(FACILITY_ICONS_BUCKET).remove([path]);
       }
     }
-    const { error } = await supabase.from('facilities').delete().eq('id', parsed.data.id);
+    const { error } = await supabase.from('facility').delete().eq('id', parsed.data.id);
     if (error) throw error;
     revalidatePath('/home/facilities');
     return { success: true };

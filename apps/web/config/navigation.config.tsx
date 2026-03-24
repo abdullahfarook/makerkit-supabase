@@ -1,4 +1,4 @@
-import { Building, Home, User } from 'lucide-react';
+import { Building, Home, User, List, Tag, Calendar, Star } from 'lucide-react';
 import { z } from 'zod';
 
 import { NavigationConfigSchema } from '@kit/ui/navigation-schema';
@@ -21,6 +21,36 @@ const routes = [
         label: 'common:routes.facilities',
         path: pathsConfig.app.facilities,
         Icon: <Building className={iconClasses} />,
+      },
+      {
+        label: 'common:routes.hotels',
+        path: pathsConfig.app.hotels,
+        Icon: <Building className={iconClasses} />,
+      },
+      {
+        label: 'common:routes.rooms',
+        path: pathsConfig.app.rooms,
+        Icon: <List className={iconClasses} />,
+      },
+      {
+        label: 'common:routes.hotelFacilities',
+        path: pathsConfig.app.hotelFacilities,
+        Icon: <Tag className={iconClasses} />,
+      },
+      {
+        label: 'common:routes.promotions',
+        path: pathsConfig.app.promotions,
+        Icon: <Tag className={iconClasses} />,
+      },
+      {
+        label: 'common:routes.bookings',
+        path: pathsConfig.app.bookings,
+        Icon: <Calendar className={iconClasses} />,
+      },
+      {
+        label: 'common:routes.reviews',
+        path: pathsConfig.app.reviews,
+        Icon: <Star className={iconClasses} />,
       }
     ],
   },

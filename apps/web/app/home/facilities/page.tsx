@@ -8,7 +8,7 @@ export default async function FacilitiesPage() {
     console.log("FacilitiesPage");
   const supabase = getSupabaseServerAdminClient();
   const { data: facilities, error } = await supabase
-    .from('facilities')
+    .from('facility')
     .select('*')
     .order('name');
 
@@ -16,22 +16,22 @@ export default async function FacilitiesPage() {
     if (error.code === '42P01' || error.message?.includes('does not exist')) {
       return (
         <>
-          <PageHeader
-            title={'Facilities'}
-            description={'Create and manage hotel facilities.'}
-          />
+            <PageHeader
+              title={'Facilities'}
+              description={'Create and manage hotel facilities.'}
+            />
           <PageBody>
-            <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
-              <p className="font-medium">Facilities table not found</p>
-              <p className="mt-1 text-sm">
-                Run the migration to create the <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">facilities</code> table
-                and <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">facility_icons</code> storage bucket.
-              </p>
-              <p className="mt-2 text-sm">
-                From the project root: <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">pnpm --filter web supabase db push</code> (hosted)
-                or <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">pnpm --filter web supabase db reset</code> (local).
-              </p>
-            </div>
+              <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
+                <p className="font-medium">Facilities table not found</p>
+                <p className="mt-1 text-sm">
+                  Run the migration to create the <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">facility</code> table
+                  and <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">facility_icons</code> storage bucket.
+                </p>
+                <p className="mt-2 text-sm">
+                  From the project root: <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">pnpm --filter web supabase db push</code> (hosted)
+                  or <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">pnpm --filter web supabase db reset</code> (local).
+                </p>
+              </div>
           </PageBody>
         </>
       );

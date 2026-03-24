@@ -18,8 +18,7 @@ import { Label } from '@kit/ui/label';
 import { updateFacilityAction } from '../actions';
 
 import type { Tables } from '~/lib/database.types';
-
-type Facility = Tables<'facilities'>;
+type Facility = Tables<'facility'>;
 
 export function EditFacilityDialog({
   facility,
@@ -46,7 +45,7 @@ export function EditFacilityDialog({
       if (!facility) return;
       const form = e.currentTarget;
       const formData = new FormData(form);
-      formData.set('id', facility.id);
+      formData.set('id', String(facility.id));
       if (iconFile) formData.set('icon', iconFile);
       setPending(true);
       try {

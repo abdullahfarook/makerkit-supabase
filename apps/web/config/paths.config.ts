@@ -13,6 +13,12 @@ const PathsSchema = z.object({
     home: z.string().min(1),
     profileSettings: z.string().min(1),
     facilities: z.string().min(1),
+    hotels: z.string().min(1),
+    rooms: z.string().min(1),
+    hotelFacilities: z.string().min(1),
+    promotions: z.string().min(1),
+    bookings: z.string().min(1),
+    reviews: z.string().min(1),
   }),
 });
 
@@ -28,7 +34,13 @@ const pathsConfig = PathsSchema.parse({
   app: {
     home: '/home',
     profileSettings: '/home/settings',
-    facilities: '/home/facilities', 
+    facilities: '/home/facilities',
+    hotels: '/home/hotels',
+    rooms: '/home/rooms',
+    hotelFacilities: '/home/hotel-facilities',
+    promotions: '/home/promotions',
+    bookings: '/home/bookings',
+    reviews: '/home/reviews',
   },
 } satisfies z.infer<typeof PathsSchema>);
 
